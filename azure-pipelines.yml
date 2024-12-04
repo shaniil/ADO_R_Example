@@ -1,0 +1,23 @@
+trigger:
+- main  # Change according to your branch name
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- script: |
+    echo "Installing R and R dependencies"
+    sudo apt-get update
+    sudo apt-get install -y r-base r-base-dev libcurl4-openssl-dev libssl-dev libxml2-dev
+
+    # Set R config to point to Artifactory repo
+    echo "options(repos = c(CRAN = 'http://cran.rstudio.com', R_artifactory = 'http://your.artifactory.url/r-repo'))" > ~/.Rprofile
+
+    # Install the package from Artifactory
+    Rscript -e "install.packages('your-r-package', repos='http://your.artifactory.url/r-repo', dependencies=TRUE)"
+  displayName: 'Install R and Packages from Artifactory'
+
+- script: |
+    echo "Running R Script"
+    Rscript -e "library(your-r-package); print('Package loaded successfully')"
+  displayName: 'Execute R Script'
